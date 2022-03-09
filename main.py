@@ -17,22 +17,11 @@ def pad(data):
     return bytearray_data
 
 
-def convert_to_RGB(data):
-    r, g, b = tuple(map(lambda d: [data[i] for i in range(0, len(data)) if i % 3 == d], [0, 1, 2]))
-    pixels = tuple(zip(r, g, b))
-    return pixels
-
-
 def process_image(filename):
     f = open(filename, 'rb')
-    im3 = Image.open(filename)
     data = f.read()
-    new = convert_to_RGB(bytearray(data))
-    im2 = Image.new(im3.mode, im3.size)
-    im2.putdata(new)
-    im2.save("filename_out312.jpeg", 'jpeg')
-    print(len(data))
     img_bytes = aes_ecb_encrypt(key, pad(data))
+    # print(img_bytes)   // вывести зашифрованные байты
     f = open(filename_out, 'wb')
     f.write(img_bytes)
 
@@ -47,6 +36,7 @@ def create_dictionary():
     dictionary = bytearray()
     for i in range(256):
         dictionary += bytearray(i.to_bytes(16, byteorder='little'))
+    # print(dictionary)   // вывести словарь
     return dictionary
 
 
@@ -55,8 +45,7 @@ def encrypt_dict(dictionary):
 
 
 def decode_image():
-    im3 = Image.open(filename)
-    f = open('./1_enc', 'rb')
+    f = open('./dict', 'rb')
     dictionary = f.read()
     im = open('./1_enc_img', 'rb')
     data2 = im.read()
@@ -66,7 +55,7 @@ def decode_image():
     for i in range(16, len(dictionary) + 1, 16):
         temp_dict = {(dictionary[l: i]): c.to_bytes(1, byteorder='little')}
         dict.update(temp_dict)
-        # print(temp_dict, c)
+        # print(temp_dict, c)  // вывести шифрованные байты - байты - 10 сист
         c += 1
         l = i
     c = 0
@@ -77,28 +66,14 @@ def decode_image():
         result += dict[data2[l: i]]
         c += 1
         l = i
-    f = open('res', 'wb')
-    f.write(result)
-    print(len(result))
     stream = BytesIO(result)
     image = Image.open(stream).convert("RGBA")
     stream.close()
-    image.show()
-    picture = image.save("{}.bmp".format("eqwe"))
-    new = convert_to_RGB(result)
-    im2 = Image.new(im3.mode, im3.size)
-    im2.putdata(new)
-    im2.save(filename_out + ".jpeg", 'jpeg')
-
-
-def decode(file):
-    im = Image.open(file)
-    data = im.convert("RGB").tobytes()
-    original = len(data)
+    picture = image.save("{}.bmp".format("decoded_image"))
 
 
 def main():
-    f = open('./1_enc', 'wb')
+    f = open('./dict', 'wb')
     f.write(encrypt_dict(create_dictionary()))
     f.close()
     process_image(filename)
