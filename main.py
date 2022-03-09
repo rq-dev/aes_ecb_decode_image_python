@@ -52,10 +52,12 @@ def decode_image():
     dict = {}
     c = 0
     l = 0
+    dict_file = open('./dict.txt', 'a')
     for i in range(16, len(dictionary) + 1, 16):
         temp_dict = {(dictionary[l: i]): c.to_bytes(1, byteorder='little')}
         dict.update(temp_dict)
         # print(temp_dict, c)  // вывести шифрованные байты - байты - 10 сист
+        dict_file.write("{} - {}\n".format(temp_dict, c))
         c += 1
         l = i
     c = 0
