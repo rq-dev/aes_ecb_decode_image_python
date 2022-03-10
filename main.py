@@ -3,10 +3,11 @@ import sys
 from PIL import Image, ImageFile
 from Cryptodome.Cipher import AES
 from io import BytesIO
+import os
 
-filename = "jessica.bmp"
-filename_out = "1_enc_img"
-key = "aaaabbbbccccdddd"
+
+filename_out = "enc_img"
+key = os.urandom(16)
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
@@ -33,7 +34,7 @@ def process_image(filename):
 
 
 def aes_ecb_encrypt(key, data, mode=AES.MODE_ECB):
-    aes = AES.new(key.encode("utf8"), mode)
+    aes = AES.new(key, mode)
     new_data = aes.encrypt(data)
     return new_data
 
